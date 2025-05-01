@@ -61,11 +61,11 @@ def product_list_api(request):
 def register_order(request):
     serialized_order = json.loads(request.body.decode())
 
-    products = serialized_order['products']
-    first_name = serialized_order['firstname']
-    last_name = serialized_order['lastname']
-    address = serialized_order['address']
-    phone_number = serialized_order['phonenumber']
+    products = serialized_order.get('products')
+    first_name = serialized_order.get('firstname')
+    last_name = serialized_order.get('lastname')
+    address = serialized_order.get('address')
+    phone_number = serialized_order.get('phonenumber')
 
     order = Order(
         first_name=first_name,
@@ -78,7 +78,7 @@ def register_order(request):
     for product in products:
         OrderItem.objects.create(
             order_id=order.id,
-            product_id=product['product'],
-            quantity=product['quantity'],
+            product_id=product.get('product'),
+            quantity=product.get('quantity'),
         )
     return JsonResponse({})
