@@ -2,7 +2,9 @@ import json
 
 from django.http import JsonResponse
 from django.templatetags.static import static
+from rest_framework import status
 from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 from .models import Product, Order, OrderItem
 
@@ -62,12 +64,16 @@ def product_list_api(request):
 @api_view(['POST'])
 def register_order(request):
     serialized_order = request.data
-    print(serialized_order)
+
     products = serialized_order.get('products')
     first_name = serialized_order.get('firstname')
     last_name = serialized_order.get('lastname')
     address = serialized_order.get('address')
     phone_number = serialized_order.get('phonenumber')
+
+    if not isinstance(products, list) or products is not None:
+        content = {'что-то не так': 'тут ошибка'}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
     order = Order(
         first_name=first_name,
