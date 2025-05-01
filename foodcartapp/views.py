@@ -1,4 +1,5 @@
 import json
+import pprint
 
 from django.http import JsonResponse
 from django.templatetags.static import static
@@ -73,19 +74,19 @@ def register_order(request):
     address = serializer.validated_data['address']
     phonenumber = serializer.validated_data['phonenumber']
 
-    order = Order(
+    order = Order.objects.create(
         firstname=firstname,
         lastname=lastname,
         address=address,
         phonenumber=phonenumber,
     )
-    order.save()
 
     for product in products:
-        print(product)
         OrderItem.objects.create(
             order_id=order.id,
             product_id=product.get('product').id,
             quantity=product.get('quantity'),
         )
-    return JsonResponse({})
+    response_serializer = OrderSerializer(order)
+    return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+
