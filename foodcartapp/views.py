@@ -7,6 +7,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from .models import Product, Order, OrderItem
+from .serializers import OrderSerializer
 
 
 def banners_list_api(request):
@@ -63,30 +64,28 @@ def product_list_api(request):
 
 @api_view(['POST'])
 def register_order(request):
-    serialized_order = request.data
+    serializer = OrderSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
 
-    products = serialized_order.get('products')
-    first_name = serialized_order.get('firstname')
-    last_name = serialized_order.get('lastname')
-    address = serialized_order.get('address')
-    phone_number = serialized_order.get('phonenumber')
-
-    if not isinstance(products, list) or products is not None:
-        content = {'что-то не так': 'тут ошибка'}
-        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    products = serializer.validated_data['products']
+    firstname = serializer.validated_data['firstname']
+    lastname = serializer.validated_data['lastname']
+    address = serializer.validated_data['address']
+    phonenumber = serializer.validated_data['phonenumber']
 
     order = Order(
-        first_name=first_name,
-        last_name=last_name,
+        firstname=firstname,
+        lastname=lastname,
         address=address,
-        phone_number=phone_number,
+        phonenumber=phonenumber,
     )
     order.save()
 
     for product in products:
+        print(product)
         OrderItem.objects.create(
             order_id=order.id,
-            product_id=product.get('product'),
+            product_id=product.get('product').id,
             quantity=product.get('quantity'),
         )
     return JsonResponse({})
