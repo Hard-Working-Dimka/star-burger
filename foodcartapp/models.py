@@ -128,14 +128,21 @@ class RestaurantMenuItem(models.Model):
 class OrderQuerySet(models.QuerySet):
     def total_price(self):
         orders_with_total_price = (self
-                  .prefetch_related(Prefetch('items', queryset=OrderItem.objects.select_related('product')))
-                  .all()
-                  .annotate(total_price=Sum(F('items__quantity')*F('items__product__price')))
-                  )
+                                   .prefetch_related(
+            Prefetch('items', queryset=OrderItem.objects.select_related('product')))
+                                   .all()
+                                   .annotate(total_price=Sum(F('items__quantity') * F('items__product__price')))
+                                   )
         return orders_with_total_price
 
 
 class Order(models.Model):
+    STATUS = [
+        ('accepted', 'Принят'),
+        ('in_progress', 'В сборке'),
+        ('in_delivery', 'В доставке'),
+        ('completed', 'Выполнен'),
+    ]
     address = models.CharField(
         max_length=100,
         null=False,
@@ -155,6 +162,12 @@ class Order(models.Model):
         region='RU',
         verbose_name='Мобильный номер',
         null=False,
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS,
+        db_index=True,
+        default='accepted'
     )
 
     objects = OrderQuerySet.as_manager()
