@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 from django.db.models import F, Prefetch, Sum
+from django.utils import timezone
 from phonenumber_field.modelfields import PhoneNumberField
 
 
@@ -137,11 +138,15 @@ class OrderQuerySet(models.QuerySet):
 
 
 class Order(models.Model):
-    STATUS = [
+    ORDER_STATUS = [
         ('accepted', 'Принят'),
         ('in_progress', 'В сборке'),
         ('in_delivery', 'В доставке'),
         ('completed', 'Выполнен'),
+    ]
+    PAYMENT_METHOD = [
+        ('cash', 'Наличными'),
+        ('online', 'Электронно'),
     ]
     address = models.CharField(
         max_length=100,
@@ -165,7 +170,7 @@ class Order(models.Model):
     )
     status = models.CharField(
         max_length=20,
-        choices=STATUS,
+        choices=ORDER_STATUS,
         db_index=True,
         default='accepted',
         verbose_name='Статус',
@@ -174,6 +179,28 @@ class Order(models.Model):
         blank=True,
         null=False,
         verbose_name='Комментарий',
+    )
+    registered_at = models.DateTimeField(
+        default=timezone.now(),
+        blank=True,
+        verbose_name='Зарегистрирован в',
+        db_index=True
+    )
+    called_at = models.DateTimeField(
+        blank=True,
+        verbose_name='Звонок в',
+        db_index=True,
+    )
+    delivered_at = models.DateTimeField(
+        blank=True,
+        verbose_name='Доставка в',
+        db_index=True,
+    )
+    payment_method = models.CharField(
+        max_length=20,
+        choices=PAYMENT_METHOD,
+        db_index=True,
+        verbose_name='Способ оплаты',
     )
 
     objects = OrderQuerySet.as_manager()
