@@ -16,7 +16,8 @@ class RestaurantMenuItemInline(admin.TabularInline):
 
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
-    fields = ('product', 'quantity')
+    fields = ['product', 'quantity', 'price']
+    readonly_fields = ['price']
     extra = 0
 
 
@@ -97,13 +98,16 @@ class ProductAdmin(admin.ModelAdmin):
         if not obj.image:
             return 'выберите картинку'
         return format_html('<img src="{url}" style="max-height: 200px;"/>', url=obj.image.url)
+
     get_image_preview.short_description = 'превью'
 
     def get_image_list_preview(self, obj):
         if not obj.image or not obj.id:
             return 'нет картинки'
         edit_url = reverse('admin:foodcartapp_product_change', args=(obj.id,))
-        return format_html('<a href="{edit_url}"><img src="{src}" style="max-height: 50px;"/></a>', edit_url=edit_url, src=obj.image.url)
+        return format_html('<a href="{edit_url}"><img src="{src}" style="max-height: 50px;"/></a>', edit_url=edit_url,
+                           src=obj.image.url)
+
     get_image_list_preview.short_description = 'превью'
 
 
@@ -116,6 +120,16 @@ class ProductAdmin(admin.ModelAdmin):
 class OrderAdmin(admin.ModelAdmin):
     inlines = [OrderItemInline, ]
 
+    def save_formset(self, request, form, formset, change):
+        print('привет!')
+        instances = formset.save(commit=False)
+        for instance in instances:
+            instance.price = instance.product.price
+            instance.save()
+        formset.save_m2m()
+
+
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
-    list_display = ['order' ,'product', 'quantity']
+    list_display = ['order', 'product', 'quantity', 'price',]
+
