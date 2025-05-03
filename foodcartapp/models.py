@@ -167,7 +167,13 @@ class Order(models.Model):
         max_length=20,
         choices=STATUS,
         db_index=True,
-        default='accepted'
+        default='accepted',
+        verbose_name='Статус',
+    )
+    comment = models.TextField(
+        blank=True,
+        null=False,
+        verbose_name='Комментарий',
     )
 
     objects = OrderQuerySet.as_manager()
