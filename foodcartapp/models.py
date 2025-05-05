@@ -204,6 +204,14 @@ class Order(models.Model):
         db_index=True,
         verbose_name='Способ оплаты',
     )
+    restaurant = models.ForeignKey(
+        Restaurant,
+        on_delete=models.CASCADE,
+        related_name='orders',
+        verbose_name='Ресторан',
+        blank=True,
+        null=True,
+    )
 
     objects = OrderQuerySet.as_manager()
 
