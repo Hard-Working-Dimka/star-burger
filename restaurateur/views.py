@@ -9,6 +9,8 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
 from environs import env
+from requests import RequestException
+
 from foodcartapp.models import Product, Restaurant, Order, RestaurantMenuItem
 from geocoordapp.models import Place
 from .auxiliary_funcs import fetch_coordinates
@@ -108,18 +110,20 @@ def view_orders(request):
         order.free_restaurants = []
         items = order.items.all()
         order_free_restaurants = []
+
         for item in items:
             item.free_restaurants = []
             for restaurant_item in items_of_restaurants:
                 if item.product_id == restaurant_item.product_id:
                     item.free_restaurants.append(restaurant_item.restaurant_id)
             order_free_restaurants.append(item.free_restaurants)
+
         if order_free_restaurants:
             common_restaurants = set(order_free_restaurants[0])
             for free_restaurant in order_free_restaurants[1:]:
                 common_restaurants &= set(free_restaurant)
-
             common_restaurants = list(common_restaurants)
+
             for common_restaurant in common_restaurants:
                 for restaurant in restaurants:
                     if common_restaurant == restaurant.id:
@@ -139,25 +143,33 @@ def view_orders(request):
 
                         if not order_address_lon and not order_address_lat:
                             try:
-                                order_address_lat, order_address_lon = fetch_coordinates(env('YANDEX_TOKEN'), order.address)
+                                order_address_lat, order_address_lon = fetch_coordinates(env('YANDEX_TOKEN'),
+                                                                                         order.address)
                             except TypeError:
                                 distance = 'не определена!'
                             else:
-                                Place.objects.create(address=order.address, lat=order_address_lat, lon=order_address_lon)
+                                Place.objects.create(address=order.address, lat=order_address_lat,
+                                                     lon=order_address_lon)
 
                         if not restaurant_address_lon and not restaurant_address_lat:
                             try:
-                             restaurant_address_lat, restaurant_address_lon = fetch_coordinates(env('YANDEX_TOKEN'), restaurant.address)
-                            except TypeError:
-                                distance = 'не определена!'
+                                restaurant_address_lat, restaurant_address_lon = fetch_coordinates(env('YANDEX_TOKEN'),
+                                                                                                   restaurant.address)
+                            except (RequestException, TypeError):
+                                distance = 'расстояние не определено,'
                             else:
-                                Place.objects.create(address=restaurant.address, lat=restaurant_address_lat, lon=restaurant_address_lon)
+                                Place.objects.create(address=restaurant.address, lat=restaurant_address_lat,
+                                                     lon=restaurant_address_lon)
                         if not distance:
-                            distance = round(geodesic((order_address_lat, order_address_lon), (restaurant_address_lat, restaurant_address_lon)).km,2)
+                            distance = round(geodesic((order_address_lat, order_address_lon),
+                                                      (restaurant_address_lat, restaurant_address_lon)).km, 2)
 
                         order.free_restaurants.append({restaurant.name: distance})
 
                         break
 
+        order.free_restaurants = sorted(order.free_restaurants, key=lambda x: list(x.values())[0], reverse=False)
 
-    return render(request, template_name='order_items.html', context={'order_items': orders, 'order_in_progress': orders_in_progress, 'order_in_delivery': orders_in_delivery})
+    return render(request, template_name='order_items.html',
+                  context={'order_items': orders, 'order_in_progress': orders_in_progress,
+                           'order_in_delivery': orders_in_delivery})

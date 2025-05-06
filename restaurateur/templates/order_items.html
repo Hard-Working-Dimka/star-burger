@@ -29,25 +29,28 @@
           <td>{{ item.id }}</td>
           <td>{{ item.get_status_display }}</td>
           <td>{{ item.get_payment_method_display }}</td>
-          <td>{{ item.total_price|default:"—"  }}</td>
-          <td>{{ item.firstname }} {{ item.lastname|default:"—"  }}</td>
-          <td>{{ item.phonenumber|default:"—"  }}</td>
-          <td>{{ item.address|default:"—"  }}</td>
-          <td>{{ item.comment|default:"—"  }}</td>
+          <td>{{ item.total_price|default:"—" }}</td>
+          <td>{{ item.firstname }} {{ item.lastname|default:"—" }}</td>
+          <td>{{ item.phonenumber|default:"—" }}</td>
+          <td>{{ item.address|default:"—" }}</td>
+          <td>{{ item.comment|default:"—" }}</td>
 
 
           {% if item.restaurant %}
-             <td> Заказ готовит: {{ item.restaurant }} </td>
+            <td> Заказ готовит: {{ item.restaurant }} </td>
           {% else %}
-             <td> <details> <summary>Заказ могут выполнить:</summary>
+            <td>
+              <details>
+                <summary>Заказ могут выполнить:</summary>
 
-               {% for restaurant_info in item.free_restaurants %}
+                {% for restaurant_info in item.free_restaurants %}
                   {% for name, distance in restaurant_info.items %}
-                  <p>{{ name }} — {{ distance }} км</p>
+                    <p>{{ name }} — {{ distance }} км</p>
                   {% endfor %}
                 {% endfor %}
 
-             </details> </td>
+              </details>
+            </td>
           {% endif %}
 
           <td><a href={% url "admin:foodcartapp_order_change" object_id=item.id %}?next={{ request.path|urlencode }}>Редактировать</a>
@@ -84,14 +87,14 @@
           <td>{{ item.id }}</td>
           <td>{{ item.get_status_display }}</td>
           <td>{{ item.get_payment_method_display }}</td>
-          <td>{{ item.total_price|default:"—"  }}</td>
-          <td>{{ item.firstname }} {{ item.lastname|default:"—"  }}</td>
-          <td>{{ item.phonenumber|default:"—"  }}</td>
-          <td>{{ item.address|default:"—"  }}</td>
-          <td>{{ item.comment|default:"—"  }}</td>
+          <td>{{ item.total_price|default:"—" }}</td>
+          <td>{{ item.firstname }} {{ item.lastname|default:"—" }}</td>
+          <td>{{ item.phonenumber|default:"—" }}</td>
+          <td>{{ item.address|default:"—" }}</td>
+          <td>{{ item.comment|default:"—" }}</td>
 
 
-             <td>{{ item.restaurant|default:"—" }} </td>
+          <td>{{ item.restaurant|default:"—" }} </td>
 
           <td><a href={% url "admin:foodcartapp_order_change" object_id=item.id %}?next={{ request.path|urlencode }}>Редактировать</a>
           </td>
@@ -102,7 +105,7 @@
 
 
 
-    <center>
+  <center>
     <h2>Заказы в доставке</h2>
   </center>
 
@@ -128,14 +131,14 @@
           <td>{{ item.id }}</td>
           <td>{{ item.get_status_display }}</td>
           <td>{{ item.get_payment_method_display }}</td>
-          <td>{{ item.total_price|default:"—"  }}</td>
-          <td>{{ item.firstname }} {{ item.lastname|default:"—"  }}</td>
-          <td>{{ item.phonenumber|default:"—"  }}</td>
-          <td>{{ item.address|default:"—"  }}</td>
-          <td>{{ item.comment|default:"—"  }}</td>
+          <td>{{ item.total_price|default:"—" }}</td>
+          <td>{{ item.firstname }} {{ item.lastname|default:"—" }}</td>
+          <td>{{ item.phonenumber|default:"—" }}</td>
+          <td>{{ item.address|default:"—" }}</td>
+          <td>{{ item.comment|default:"—" }}</td>
 
 
-             <td> Заказ готовит: {{ item.restaurant|default:"—" }} </td>
+          <td> Заказ готовит: {{ item.restaurant|default:"—" }} </td>
 
           <td><a href={% url "admin:foodcartapp_order_change" object_id=item.id %}?next={{ request.path|urlencode }}>Редактировать</a>
           </td>
