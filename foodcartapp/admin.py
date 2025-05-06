@@ -5,10 +5,8 @@ from django.templatetags.static import static
 from django.utils.html import format_html
 from django.utils.http import url_has_allowed_host_and_scheme
 
-from .models import Product, Order, OrderItem
-from .models import ProductCategory
-from .models import Restaurant
-from .models import RestaurantMenuItem
+from .models import Product, Order, OrderItem,ProductCategory, Restaurant, RestaurantMenuItem
+from geocoordapp.models import Place
 
 
 class RestaurantMenuItemInline(admin.TabularInline):
@@ -142,3 +140,7 @@ class OrderAdmin(admin.ModelAdmin):
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
     list_display = ['order', 'product', 'quantity', 'price', ]
+
+@admin.register(Place)
+class PlaceAdmin(admin.ModelAdmin):
+    list_display = ['address', 'lon', 'lat', 'request']

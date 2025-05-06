@@ -1,15 +1,17 @@
-from itertools import product
+from geopy.distance import geodesic, distance
 
 from django import forms
-from django.shortcuts import redirect, render, get_list_or_404
+from django.shortcuts import redirect, render
 from django.views import View
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import user_passes_test
 
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
-
+from environs import env
 from foodcartapp.models import Product, Restaurant, Order, RestaurantMenuItem
+from geocoordapp.models import Place
+from .auxiliary_funcs import fetch_coordinates
 
 
 class Login(forms.Form):
@@ -97,6 +99,8 @@ def view_orders(request):
     orders_in_progress = Order.objects.total_price().filter(status='in_progress')
     orders_in_delivery = Order.objects.total_price().filter(status='in_delivery')
 
+    places = Place.objects.all()
+
     items_of_restaurants = RestaurantMenuItem.objects.filter(availability=True)
     restaurants = Restaurant.objects.all()
 
@@ -119,7 +123,40 @@ def view_orders(request):
             for common_restaurant in common_restaurants:
                 for restaurant in restaurants:
                     if common_restaurant == restaurant.id:
-                        order.free_restaurants.append(restaurant.name)
+                        order_address_lon = None
+                        order_address_lat = None
+                        restaurant_address_lon = None
+                        restaurant_address_lat = None
+                        distance = None
+
+                        for place in places:
+                            if place.address == order.address:
+                                order_address_lon = place.lon
+                                order_address_lat = place.lat
+                            if place.address == restaurant.address:
+                                restaurant_address_lon = place.lon
+                                restaurant_address_lat = place.lat
+
+                        if not order_address_lon and not order_address_lat:
+                            try:
+                                order_address_lat, order_address_lon = fetch_coordinates(env('YANDEX_TOKEN'), order.address)
+                            except TypeError:
+                                distance = 'не определена!'
+                            else:
+                                Place.objects.create(address=order.address, lat=order_address_lat, lon=order_address_lon)
+
+                        if not restaurant_address_lon and not restaurant_address_lat:
+                            try:
+                             restaurant_address_lat, restaurant_address_lon = fetch_coordinates(env('YANDEX_TOKEN'), restaurant.address)
+                            except TypeError:
+                                distance = 'не определена!'
+                            else:
+                                Place.objects.create(address=restaurant.address, lat=restaurant_address_lat, lon=restaurant_address_lon)
+                        if not distance:
+                            distance = round(geodesic((order_address_lat, order_address_lon), (restaurant_address_lat, restaurant_address_lon)).km,2)
+
+                        order.free_restaurants.append({restaurant.name: distance})
+
                         break
 
 

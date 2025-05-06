@@ -1,6 +1,3 @@
-import json
-import pprint
-
 from django.db import transaction
 from django.http import JsonResponse
 from django.templatetags.static import static
