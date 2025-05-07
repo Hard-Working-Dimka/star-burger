@@ -101,26 +101,23 @@ def view_orders(request):
     orders_in_progress = Order.objects.total_price().filter(status='in_progress')
     orders_in_delivery = Order.objects.total_price().filter(status='in_delivery')
 
-    places = Place.objects.all()
-
     items_of_restaurants = RestaurantMenuItem.objects.filter(availability=True)
     restaurants = Restaurant.objects.all()
 
     for order in orders:
         order.free_restaurants = []
-        items = order.items.all()
-        order_free_restaurants = []
+        free_restaurants = []
 
-        for item in items:
+        for item in order.items.all():
             item.free_restaurants = []
             for restaurant_item in items_of_restaurants:
                 if item.product_id == restaurant_item.product_id:
                     item.free_restaurants.append(restaurant_item.restaurant_id)
-            order_free_restaurants.append(item.free_restaurants)
+            free_restaurants.append(item.free_restaurants)
 
-        if order_free_restaurants:
-            common_restaurants = set(order_free_restaurants[0])
-            for free_restaurant in order_free_restaurants[1:]:
+        if free_restaurants:
+            common_restaurants = set(free_restaurants[0])
+            for free_restaurant in free_restaurants[1:]:
                 common_restaurants &= set(free_restaurant)
             common_restaurants = list(common_restaurants)
 
@@ -133,6 +130,7 @@ def view_orders(request):
                         restaurant_address_lat = None
                         distance = None
 
+                        places = Place.objects.all()
                         for place in places:
                             if place.address == order.address:
                                 order_address_lon = place.lon
@@ -146,7 +144,7 @@ def view_orders(request):
                                 order_address_lat, order_address_lon = fetch_coordinates(env('YANDEX_TOKEN'),
                                                                                          order.address)
                             except TypeError:
-                                distance = 'не определена!'
+                                distance = 'расстояние не определено, '
                             else:
                                 Place.objects.create(address=order.address, lat=order_address_lat,
                                                      lon=order_address_lon)
@@ -156,7 +154,7 @@ def view_orders(request):
                                 restaurant_address_lat, restaurant_address_lon = fetch_coordinates(env('YANDEX_TOKEN'),
                                                                                                    restaurant.address)
                             except (RequestException, TypeError):
-                                distance = 'расстояние не определено,'
+                                distance = 'расстояние не определено, '
                             else:
                                 Place.objects.create(address=restaurant.address, lat=restaurant_address_lat,
                                                      lon=restaurant_address_lon)
@@ -165,7 +163,6 @@ def view_orders(request):
                                                       (restaurant_address_lat, restaurant_address_lon)).km, 2)
 
                         order.free_restaurants.append({restaurant.name: distance})
-
                         break
 
         order.free_restaurants = sorted(order.free_restaurants, key=lambda x: list(x.values())[0], reverse=False)
