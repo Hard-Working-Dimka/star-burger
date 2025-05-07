@@ -1,4 +1,4 @@
-from geopy.distance import geodesic, distance
+from geopy.distance import geodesic
 
 from django import forms
 from django.shortcuts import redirect, render
@@ -8,12 +8,11 @@ from django.contrib.auth.decorators import user_passes_test
 
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
-from environs import env
 from requests import RequestException
 
 from foodcartapp.models import Product, Restaurant, Order, RestaurantMenuItem
 from geocoordapp.models import Place
-from star_burger import settings
+from django.conf import settings
 from .auxiliary_funcs import fetch_coordinates
 
 
