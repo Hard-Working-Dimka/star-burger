@@ -13,6 +13,7 @@ from requests import RequestException
 
 from foodcartapp.models import Product, Restaurant, Order, RestaurantMenuItem
 from geocoordapp.models import Place
+from star_burger import settings
 from .auxiliary_funcs import fetch_coordinates
 
 
@@ -141,7 +142,7 @@ def view_orders(request):
 
                         if not order_address_lon and not order_address_lat:
                             try:
-                                order_address_lat, order_address_lon = fetch_coordinates(env('YANDEX_TOKEN'),
+                                order_address_lat, order_address_lon = fetch_coordinates(settings.YANDEX_TOKEN,
                                                                                          order.address)
                             except TypeError:
                                 distance = 'расстояние не определено, '
@@ -151,7 +152,7 @@ def view_orders(request):
 
                         if not restaurant_address_lon and not restaurant_address_lat:
                             try:
-                                restaurant_address_lat, restaurant_address_lon = fetch_coordinates(env('YANDEX_TOKEN'),
+                                restaurant_address_lat, restaurant_address_lon = fetch_coordinates(settings.YANDEX_TOKEN,
                                                                                                    restaurant.address)
                             except (RequestException, TypeError):
                                 distance = 'расстояние не определено, '
