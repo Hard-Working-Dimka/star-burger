@@ -130,14 +130,15 @@ def view_orders(request):
                         restaurant_address_lat = None
                         distance = None
 
-                        places = Place.objects.all()
-                        for place in places:
-                            if place.address == order.address:
-                                order_address_lon = place.lon
-                                order_address_lat = place.lat
-                            if place.address == restaurant.address:
-                                restaurant_address_lon = place.lon
-                                restaurant_address_lat = place.lat
+                        order_place = Place.objects.filter(address=order.address).first()
+                        restaurant_place = Place.objects.filter(address=restaurant.address).first()
+                        if order_place:
+                            order_address_lon = order_place.lon
+                            order_address_lat = order_place.lat
+
+                        if restaurant_place:
+                                restaurant_address_lon = restaurant_place.lon
+                                restaurant_address_lat = restaurant_place.lat
 
                         if not order_address_lon and not order_address_lat:
                             try:
