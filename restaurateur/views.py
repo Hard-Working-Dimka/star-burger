@@ -1,11 +1,9 @@
 from geopy.distance import geodesic
-
 from django import forms
 from django.shortcuts import redirect, render
 from django.views import View
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import user_passes_test
-
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
 from requests import RequestException
@@ -124,38 +122,33 @@ def view_orders(request):
             for common_restaurant in common_restaurants:
                 for restaurant in restaurants:
                     if common_restaurant == restaurant.id:
-                        order_address_lon = None
-                        order_address_lat = None
                         restaurant_address_lon = None
                         restaurant_address_lat = None
                         distance = None
 
                         order_place = Place.objects.filter(address=order.address).first()
-                        restaurant_place = Place.objects.filter(address=restaurant.address).first()
-                        if order_place:
+                        if order_place is None or order_place.lat is None or order_place.lon is None:
+                            distance = 'расстояние не определено, '
+                            order.free_restaurants.append({restaurant.name: distance})
+                            break
+                        else:
                             order_address_lon = order_place.lon
                             order_address_lat = order_place.lat
 
+                        restaurant_place = Place.objects.filter(address=restaurant.address).first()
                         if restaurant_place:
-                                restaurant_address_lon = restaurant_place.lon
-                                restaurant_address_lat = restaurant_place.lat
-
-                        if not order_address_lon and not order_address_lat:
-                            try:
-                                order_address_lat, order_address_lon = fetch_coordinates(settings.YANDEX_TOKEN,
-                                                                                         order.address)
-                            except TypeError:
-                                distance = 'расстояние не определено, '
-                            else:
-                                Place.objects.create(address=order.address, lat=order_address_lat,
-                                                     lon=order_address_lon)
+                            restaurant_address_lon = restaurant_place.lon
+                            restaurant_address_lat = restaurant_place.lat
 
                         if not restaurant_address_lon and not restaurant_address_lat:
                             try:
-                                restaurant_address_lat, restaurant_address_lon = fetch_coordinates(settings.YANDEX_TOKEN,
-                                                                                                   restaurant.address)
+                                restaurant_address_lat, restaurant_address_lon = fetch_coordinates(
+                                    settings.YANDEX_TOKEN,
+                                    restaurant.address)
                             except (RequestException, TypeError):
                                 distance = 'расстояние не определено, '
+                                order.free_restaurants.append({restaurant.name: distance})
+                                break
                             else:
                                 Place.objects.create(address=restaurant.address, lat=restaurant_address_lat,
                                                      lon=restaurant_address_lon)

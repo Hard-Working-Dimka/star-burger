@@ -4,8 +4,11 @@ from django.shortcuts import reverse
 from django.templatetags.static import static
 from django.utils.html import format_html
 from django.utils.http import url_has_allowed_host_and_scheme
+from requests import RequestException
+from django.conf import settings
 
-from .models import Product, Order, OrderItem,ProductCategory, Restaurant, RestaurantMenuItem
+from restaurateur.auxiliary_funcs import fetch_coordinates
+from .models import Product, Order, OrderItem, ProductCategory, Restaurant, RestaurantMenuItem
 from geocoordapp.models import Place
 
 
@@ -120,8 +123,23 @@ class ProductAdmin(admin.ModelAdmin):
 class OrderAdmin(admin.ModelAdmin):
     inlines = [OrderItemInline, ]
 
+    def save_model(self, request, obj, form, change):
+        if not change:
+            address = obj.address
+
+            if not Place.objects.filter(address=address).first():
+                try:
+                    lat, lon = fetch_coordinates(settings.YANDEX_TOKEN, address)
+                except (RequestException, TypeError):
+                    lat, lon = None, None
+                Place.objects.create(address=address, lat=lat, lon=lon)
+
+        if change and obj.restaurant and obj.status == 'accepted':
+            obj.status = 'in_progress'
+
+        super().save_model(request, obj, form, change)
+
     def save_formset(self, request, form, formset, change):
-        print('привет!')
         instances = formset.save(commit=False)
         for instance in instances:
             instance.price = instance.product.price
@@ -140,6 +158,7 @@ class OrderAdmin(admin.ModelAdmin):
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
     list_display = ['order', 'product', 'quantity', 'price', ]
+
 
 @admin.register(Place)
 class PlaceAdmin(admin.ModelAdmin):
