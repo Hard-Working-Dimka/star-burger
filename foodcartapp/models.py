@@ -150,23 +150,19 @@ class Order(models.Model):
     ]
     address = models.CharField(
         max_length=100,
-        null=False,
         verbose_name='Адрес',
     )
     firstname = models.CharField(
         verbose_name='Имя',
         max_length=50,
-        null=False,
     )
     lastname = models.CharField(
         verbose_name='Фамилия',
         max_length=50,
-        null=False,
     )
     phonenumber = PhoneNumberField(
         region='RU',
         verbose_name='Мобильный номер',
-        null=False,
     )
     status = models.CharField(
         max_length=20,
@@ -177,7 +173,6 @@ class Order(models.Model):
     )
     comment = models.TextField(
         blank=True,
-        null=False,
         verbose_name='Комментарий',
     )
     registered_at = models.DateTimeField(
@@ -246,7 +241,6 @@ class OrderItem(models.Model):
         validators=[MinValueValidator(1)],
         verbose_name='стоимость',
         blank=True,
-        null=False,
     )
 
     class Meta:
