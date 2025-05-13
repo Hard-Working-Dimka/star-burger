@@ -176,7 +176,7 @@ class Order(models.Model):
         verbose_name='Комментарий',
     )
     registered_at = models.DateTimeField(
-        default=timezone.now(),
+        auto_now_add=True,
         blank=True,
         verbose_name='Зарегистрирован в',
         db_index=True
