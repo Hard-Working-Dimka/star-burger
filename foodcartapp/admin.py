@@ -40,6 +40,19 @@ class RestaurantAdmin(admin.ModelAdmin):
         RestaurantMenuItemInline
     ]
 
+    def save_model(self, request, obj, form, change):
+        if not change:
+            address = obj.address
+
+            if not Place.objects.filter(address=address).first():
+                try:
+                    lat, lon = fetch_coordinates(settings.YANDEX_TOKEN, address)
+                except (RequestException, TypeError):
+                    lat, lon = None, None
+                Place.objects.create(address=address, lat=lat, lon=lon)
+
+        super().save_model(request, obj, form, change)
+
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):

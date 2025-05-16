@@ -6,12 +6,9 @@ from django.urls import reverse_lazy
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
-from requests import RequestException
 
 from foodcartapp.models import Product, Restaurant, Order, RestaurantMenuItem
 from geocoordapp.models import Place
-from django.conf import settings
-from .auxiliary_funcs import fetch_coordinates
 
 
 class Login(forms.Form):
@@ -122,9 +119,6 @@ def view_orders(request):
             for common_restaurant in common_restaurants:
                 for restaurant in restaurants:
                     if common_restaurant == restaurant.id:
-                        restaurant_address_lon = None
-                        restaurant_address_lat = None
-                        distance = None
 
                         order_place = Place.objects.filter(address=order.address).first()
                         if order_place is None or order_place.lat is None or order_place.lon is None:
@@ -136,30 +130,23 @@ def view_orders(request):
                             order_address_lat = order_place.lat
 
                         restaurant_place = Place.objects.filter(address=restaurant.address).first()
-                        if restaurant_place:
+                        if restaurant_place is None or restaurant_place.lat is None or restaurant_place.lon is None:
+                            distance = 'расстояние не определено, '
+                            order.free_restaurants.append({restaurant.name: distance})
+                            break
+                        else:
                             restaurant_address_lon = restaurant_place.lon
                             restaurant_address_lat = restaurant_place.lat
 
-                        if not restaurant_address_lon and not restaurant_address_lat:
-                            try:
-                                restaurant_address_lat, restaurant_address_lon = fetch_coordinates(
-                                    settings.YANDEX_TOKEN,
-                                    restaurant.address)
-                            except (RequestException, TypeError):
-                                distance = 'расстояние не определено, '
-                                order.free_restaurants.append({restaurant.name: distance})
-                                break
-                            else:
-                                Place.objects.create(address=restaurant.address, lat=restaurant_address_lat,
-                                                     lon=restaurant_address_lon)
-                        if not distance:
-                            distance = round(geodesic((order_address_lat, order_address_lon),
-                                                      (restaurant_address_lat, restaurant_address_lon)).km, 2)
+                        distance = round(geodesic((order_address_lat, order_address_lon),
+                                                  (restaurant_address_lat, restaurant_address_lon)).km, 2)
 
                         order.free_restaurants.append({restaurant.name: distance})
                         break
 
-        order.free_restaurants = sorted(order.free_restaurants, key=lambda x: list(x.values())[0], reverse=False)
+        order.free_restaurants = sorted(order.free_restaurants, key=lambda x: (
+            0, list(x.values())[0]) if isinstance(list(x.values())[0], (int, float)) else (
+            1, str(list(x.values())[0])))
 
     return render(request, template_name='order_items.html',
                   context={'order_items': orders, 'order_in_progress': orders_in_progress,
