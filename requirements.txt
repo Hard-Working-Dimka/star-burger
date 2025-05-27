@@ -1,4 +1,4 @@
-django==3.2.15
+django~=4.2.20
 django-debug-toolbar==3.2.1
 Pillow==8.2.0
 environs==14.1.1
@@ -7,3 +7,4 @@ phonenumbers==9.0.4
 djangorestframework==3.16.0
 requests==2.32.3
 geopy==2.4.1
+dj-database-url==2.2.0
