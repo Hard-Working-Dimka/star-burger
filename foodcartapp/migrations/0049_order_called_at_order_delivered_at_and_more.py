@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='order',
             name='payment_method',
-            field=models.CharField(choices=[('cash', 'Наличными'), ('online', 'Электронно')], db_index=True, default=django.utils.timezone.now, max_length=20, verbose_name='Способ оплаты'),
+            field=models.CharField(choices=[('cash', 'Наличными'), ('online', 'Электронно')], db_index=True, default=django.utils.timezone.now, max_length=50, verbose_name='Способ оплаты'),
             preserve_default=False,
         ),
         migrations.AddField(
