@@ -1,7 +1,6 @@
 import os
 
 import dj_database_url
-
 from environs import env
 
 env.read_env()
@@ -89,14 +88,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env.str('DB_NAME'),
-        'USER': env.str('DB_USER'),
-        'PASSWORD': env.str('DB_PASSWORD'),
-        'HOST': env.str('DB_HOST', 'localhost'),
-        'PORT': env.int('DB_PORT', 5432),
-    }
+    'default': dj_database_url.config(
+        default=env.str('DATABASE_URL'),
+        conn_max_age=600,
+        conn_health_checks=True,
+    ),
 }
 
 AUTH_PASSWORD_VALIDATORS = [

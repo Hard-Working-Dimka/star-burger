@@ -48,7 +48,7 @@ python -m venv venv
 - Windows: `.\venv\Scripts\activate`
 - MacOS/Linux: `source venv/bin/activate`
 
-
+Если запускаете на Windows, замените `psycopg2-binary==2.9.10` на `psycopg2==2.9.10` в файле `requirements.txt`.
 Установите зависимости в виртуальное окружение:
 ```sh
 pip install -r requirements.txt
@@ -62,6 +62,7 @@ ROLLBAR_TOKEN=
 ```
 `YANDEX_TOKEN` - получите API ключ в [кабинете разработчика](https://developer.tech.yandex.ru/). Используется для вычисления координат мест.
 `ROLLBAR_TOKEN` - получите на сайте [Rollbar](https://app.rollbar.com/)
+`DATABASE_URL` - подключение к БД. Схема `postgres://USER:PASSWORD@HOST:PORT/NAME`
 
 Создайте файл базы данных SQLite и отмигрируйте её следующей командой:
 
@@ -151,8 +152,7 @@ Parcel будет следить за файлами в каталоге `bundle
 - `DEBUG` — дебаг-режим. Поставьте `False`.
 - `SECRET_KEY` — секретный ключ проекта. Он отвечает за шифрование на сайте. Например, им зашифрованы все пароли на вашем сайте.
 - `ALLOWED_HOSTS` — [см. документацию Django](https://docs.djangoproject.com/en/3.1/ref/settings/#allowed-hosts)
-  - `ROLLBAR_ENVIRONMENT` - название окружения environment. По умолчанию - `production`
-
+- `ROLLBAR_ENVIRONMENT` - название окружения environment. По умолчанию - `production`
 ## Цели проекта
 
 Код написан в учебных целях — это урок в курсе по Python и веб-разработке на сайте [Devman](https://dvmn.org). За основу был взят код проекта [FoodCart](https://github.com/Saibharath79/FoodCart).
