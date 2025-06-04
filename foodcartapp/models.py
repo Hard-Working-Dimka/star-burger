@@ -165,7 +165,7 @@ class Order(models.Model):
         verbose_name='Мобильный номер',
     )
     status = models.CharField(
-        max_length=50,
+        max_length=20,
         choices=ORDER_STATUS,
         db_index=True,
         default='accepted',
@@ -194,7 +194,7 @@ class Order(models.Model):
         db_index=True,
     )
     payment_method = models.CharField(
-        max_length=50,
+        max_length=20,
         choices=PAYMENT_METHOD,
         db_index=True,
         verbose_name='Способ оплаты',
