@@ -172,11 +172,12 @@ python manage.py migrate
 systemctl restart star_burger.service
 systemctl reload nginx.service
 echo "Сайт успешно обновился!"
-echo '{"environment":"production","revision":"$(git rev-parse HEAD)"}' |  \
-  http POST https://api.rollbar.com/api/1/deploy \
-  X-Rollbar-Access-Token: YOUR_TOKEN \
+http POST https://api.rollbar.com/api/1/deploy \
+  X-Rollbar-Access-Token:YOUR_TOKEN \
   accept:application/json \
-  content-type:application/json
+  content-type:application/json \
+  environment=production \
+  revision=$(git rev-parse HEAD)
 ```
 
 ## Цели проекта
