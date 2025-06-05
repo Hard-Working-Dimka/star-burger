@@ -13,6 +13,8 @@
 
 Третий интерфейс — это админка. Преимущественно им пользуются программисты при разработке сайта. Также сюда заходит менеджер, чтобы обновить меню ресторанов Star Burger.
 
+Рабочий сайт можно посмотреть [здесь](https://hard-working-dimka.me/)
+
 ## Как запустить dev-версию сайта
 
 Для запуска сайта нужно запустить **одновременно** бэкенд и фронтенд, в двух терминалах.
@@ -153,10 +155,30 @@ Parcel будет следить за файлами в каталоге `bundle
 - `SECRET_KEY` — секретный ключ проекта. Он отвечает за шифрование на сайте. Например, им зашифрованы все пароли на вашем сайте.
 - `ALLOWED_HOSTS` — [см. документацию Django](https://docs.djangoproject.com/en/3.1/ref/settings/#allowed-hosts)
 - `ROLLBAR_ENVIRONMENT` - название окружения environment. По умолчанию - `production`
+
+## Фича - скрип быстрого деплоя
+
+```sh
+#!/bin/bash
+set -Eeuo pipefail
+cd /opt/star-burger
+git pull
+source venv/bin/activate
+pip install -r requirements.txt
+npm ci --dev
+./node_modules/.bin/parcel build bundles-src/index.js --dist-dir bundles --public-url="./"
+python manage.py collectstatic --noinput
+python manage.py migrate
+systemctl restart star_burger.service
+systemctl reload nginx.service
+echo "Сайт успешно обновился!"
+echo '{"environment":"production","revision":"$(git rev-parse HEAD)"}' |  \
+  http POST https://api.rollbar.com/api/1/deploy \
+  X-Rollbar-Access-Token: YOUR_TOKEN \
+  accept:application/json \
+  content-type:application/json
+```
+
 ## Цели проекта
 
-Код написан в учебных целях — это урок в курсе по Python и веб-разработке на сайте [Devman](https://dvmn.org). За основу был взят код проекта [FoodCart](https://github.com/Saibharath79/FoodCart).
-
-Где используется репозиторий:
-
-- Второй и третий урок [учебного курса Django](https://dvmn.org/modules/django/)
+Код написан в учебных целях.
