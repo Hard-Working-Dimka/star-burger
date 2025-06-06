@@ -180,6 +180,6 @@ http POST https://api.rollbar.com/api/1/deploy \
   revision=$(git rev-parse HEAD)
 ```
 
-## Цели проекта
+## Цель проекта
 
 Код написан в учебных целях.
