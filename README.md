@@ -63,7 +63,7 @@ YANDEX_TOKEN=
 ROLLBAR_TOKEN=
 ```
 `YANDEX_TOKEN` - получите API ключ в [кабинете разработчика](https://developer.tech.yandex.ru/). Используется для вычисления координат мест.
-`ROLLBAR_TOKEN` - получите на сайте [Rollbar](https://app.rollbar.com/)
+`ROLLBAR_TOKEN` - получите на сайте [Rollbar](https://app.rollbar.com/). Можно запустить сайт без подключения к Rollbar.
 `DATABASE_URL` - подключение к БД. Схема `postgres://USER:PASSWORD@HOST:PORT/NAME`
 
 Создайте файл базы данных SQLite и отмигрируйте её следующей командой:

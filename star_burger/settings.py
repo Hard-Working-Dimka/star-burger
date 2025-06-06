@@ -41,7 +41,7 @@ MIDDLEWARE = [
 ]
 
 ROLLBAR = {
-    'access_token': env('ROLLBAR_TOKEN'),
+    'access_token': env('ROLLBAR_TOKEN', ''),
     'environment': env('ROLLBAR_ENVIRONMENT', 'production'),
     'code_version': '1.0',
     'root': BASE_DIR,
