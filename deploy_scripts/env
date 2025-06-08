@@ -1,0 +1,6 @@
+SECRET_KEY='django-insecure-0if40nf4nf93n4'
+YANDEX_TOKEN=YOUR_TOKEN
+DEBUG=False
+ALLOWED_HOSTS=127.0.0.1,localhost,82.202.129.246,hard-working-dimka.me
+ROLLBAR_TOKEN=YOUR_TOKEN
+DATABASE_URL=postgres://postgres:12345@172.18.0.10:5432/star_burger
