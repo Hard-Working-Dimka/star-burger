@@ -1,0 +1,8 @@
+[Service]
+WorkingDirectory=/opt/star-burger/
+ExecStart=/opt/star-burger/venv/bin/python manage.py clearsessions
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
+

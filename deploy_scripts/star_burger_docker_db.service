@@ -1,0 +1,6 @@
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/docker start star_burger_db
+
+[Install]
+WantedBy=multi-user.target

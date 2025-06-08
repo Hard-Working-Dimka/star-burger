@@ -1,0 +1,10 @@
+[Unit]
+Description=Timer for crear user's sessions
+
+[Timer]
+OnBootSec=300
+OnCalendar=monthly
+Persistent=True
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,12 @@
+[Unit]
+Description=Django gunicorn
+After=star_burger_docker_db.service
+Requires=star_burger_docker_db.service
+[Service]
+WorkingDirectory=/opt/star-burger/
+ExecStart=/opt/star-burger/venv/bin/gunicorn -w 3 -b 127.0.0.1:8081 star_burger.wsgi:application
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
