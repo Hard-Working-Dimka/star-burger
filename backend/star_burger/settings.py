@@ -135,9 +135,9 @@ INTERNAL_IPS = [
     '127.0.0.1'
 ]
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "frontend", "assets"),
-    os.path.join(BASE_DIR, "frontend","bundles"),
-]
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, "frontend", "assets"),
+#     os.path.join(BASE_DIR, "frontend","bundles"),
+# ]
 
 YANDEX_TOKEN = env('YANDEX_TOKEN')

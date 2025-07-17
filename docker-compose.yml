@@ -22,7 +22,7 @@ services:
     image: backend
     command: [ "python3", "manage.py", "collectstatic", "--noinput" ]
     volumes:
-      - frontend:/frontend/staticfiles/
+      - frontend:/staticfiles/
     depends_on:
       - backend
 
