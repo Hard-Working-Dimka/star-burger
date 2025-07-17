@@ -10,4 +10,4 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-CMD ["gunicorn", "-w", "3", "-b", "127.0.0.1:8081", "star_burger.wsgi:application"]
+CMD ["gunicorn", "-w", "3", "-b", "0.0.0.0:8081", "star_burger.wsgi:application"]
