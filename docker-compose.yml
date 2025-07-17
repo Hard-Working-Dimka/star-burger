@@ -41,8 +41,6 @@ services:
       POSTGRES_PASSWORD: 12345
       POSTGRES_USER: postgres
       POSTGRES_DB: burgers
-#    ports:
-#      - '5432:5432'  # УДАЛИТЬ!!! только для тестов
     volumes:
       - postgres-data:/var/lib/postgresql
 
