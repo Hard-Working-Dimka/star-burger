@@ -1,12 +1,13 @@
 import os
+from pathlib import Path
 
 import dj_database_url
 from environs import env
 
 env.read_env()
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+STATIC_ROOT = os.path.join(BASE_DIR, 'frontend' ,'staticfiles')
 
 SECRET_KEY = env('SECRET_KEY')
 DEBUG = env.bool('DEBUG', False)
@@ -68,7 +69,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, "templates"),
+            os.path.join(BASE_DIR, "frontend" ,"templates"),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -84,8 +85,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'star_burger.wsgi.application'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR,'backend', 'media')
 MEDIA_URL = '/media/'
+
+# DATABASES = {
+#     'default': dj_database_url.config(
+#         default=env.str('DATABASE_URL'),
+#         conn_max_age=600,
+#         conn_health_checks=True,
+#     ),
+# }
 
 DATABASES = {
     'default': dj_database_url.config(
@@ -127,8 +136,8 @@ INTERNAL_IPS = [
 ]
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "assets"),
-    os.path.join(BASE_DIR, "bundles"),
+    os.path.join(BASE_DIR, "frontend", "assets"),
+    os.path.join(BASE_DIR, "frontend","bundles"),
 ]
 
 YANDEX_TOKEN = env('YANDEX_TOKEN')

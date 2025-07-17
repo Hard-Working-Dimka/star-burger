@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  frontend:
+    build: ./frontend
+    restart: always
+    volumes:
+      - frontend:/app/
+
+  backend:
+    build: ./backend
+    image: backend
+    restart: always
+    volumes:
+      - media-data:/app/media
+    depends_on:
+      - db
+
+
+  collectstatic:
+    image: backend
+    command: [ "python3", "manage.py", "collectstatic", "--noinput" ]
+    volumes:
+      - frontend:/app/static
+    depends_on:
+      - backend
+
+  migrate:
+    image: backend
+    command: [ "python3", "manage.py", "migrate"]
+    depends_on:
+      - backend
+
+  db:
+    image: postgres
+    restart: always
+    shm_size: 128mb
+    environment:
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_USER: postgres
+      POSTGRES_DB: burgers
+#    ports:
+#      - '5432:5432'  # УДАЛИТЬ!!! только для тестов
+    volumes:
+      - postgres-data:/var/lib/postgresql
+
+volumes:
+  frontend:
+  postgres-data:
+  media-data:
