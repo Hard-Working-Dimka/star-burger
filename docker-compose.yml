@@ -14,6 +14,7 @@ services:
       - '8081:8081'
     volumes:
       - media-data:/app/media
+      - frontend/staticfiles:/staticfiles/
     depends_on:
       - db
 
@@ -22,7 +23,7 @@ services:
     image: backend
     command: [ "python3", "manage.py", "collectstatic", "--noinput" ]
     volumes:
-      - frontend:/staticfiles/
+      - frontend/staticfiles:/staticfiles/
     depends_on:
       - backend
 

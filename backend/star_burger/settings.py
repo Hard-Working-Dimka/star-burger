@@ -88,14 +88,6 @@ WSGI_APPLICATION = 'star_burger.wsgi.application'
 MEDIA_ROOT = os.path.join(BASE_DIR,'backend', 'media')
 MEDIA_URL = '/media/'
 
-# DATABASES = {
-#     'default': dj_database_url.config(
-#         default=env.str('DATABASE_URL'),
-#         conn_max_age=600,
-#         conn_health_checks=True,
-#     ),
-# }
-
 DATABASES = {
     'default': dj_database_url.config(
         default=env.str('DATABASE_URL'),
@@ -135,9 +127,9 @@ INTERNAL_IPS = [
     '127.0.0.1'
 ]
 
-# STATICFILES_DIRS = [
-#     os.path.join(BASE_DIR, "frontend", "assets"),
-#     os.path.join(BASE_DIR, "frontend","bundles"),
-# ]
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "assets"),
+    os.path.join(BASE_DIR, "bundles"),
+]
 
 YANDEX_TOKEN = env('YANDEX_TOKEN')
