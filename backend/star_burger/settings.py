@@ -7,12 +7,12 @@ from environs import env
 env.read_env()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-STATIC_ROOT = os.path.join(BASE_DIR ,'staticfiles')
+STATIC_ROOT = '/app/staticfiles'
 
 SECRET_KEY = env('SECRET_KEY')
 DEBUG = env.bool('DEBUG', False)
 
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', ['127.0.0.1', 'localhost'])
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', ['127.0.0.1', 'localhost','82.202.129.246'])
 
 INSTALLED_APPS = [
     'foodcartapp.apps.FoodcartappConfig',
@@ -69,7 +69,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, "frontend" ,"templates"),
+            "/app/staticfiles/templates",
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -128,8 +128,8 @@ INTERNAL_IPS = [
 ]
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "assets"),
-    os.path.join(BASE_DIR, "bundles"),
+    os.path.join("/app/staticfiles/assets"),
+    os.path.join("/app/staticfiles/bundles"),
 ]
 
 YANDEX_TOKEN = env('YANDEX_TOKEN')
