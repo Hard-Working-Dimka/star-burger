@@ -14,8 +14,8 @@ services:
     ports:
       - '8081:8081'
     volumes:
-      - media-data:/app/media
-      - frontend/:/app/staticfiles/
+      - media-data:/app/media/
+      - frontend:/frontend/
     depends_on:
       - db
 
@@ -25,6 +25,7 @@ services:
     command: [ "python3", "manage.py", "collectstatic", "--noinput" ]
     volumes:
       - frontend:/app/staticfiles/
+      - frontend:/frontend/
     depends_on:
       - frontend
       - backend

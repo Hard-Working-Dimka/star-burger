@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 
 import dj_database_url
@@ -6,13 +5,13 @@ from environs import env
 
 env.read_env()
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-STATIC_ROOT = '/app/staticfiles'
+BASE_DIR = Path(__file__).resolve().parent.parent
+STATIC_ROOT = (BASE_DIR / 'staticfiles').resolve()
 
 SECRET_KEY = env('SECRET_KEY')
 DEBUG = env.bool('DEBUG', False)
 
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', ['127.0.0.1', 'localhost','82.202.129.246'])
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', ['127.0.0.1', 'localhost', '82.202.129.246'])
 
 INSTALLED_APPS = [
     'foodcartapp.apps.FoodcartappConfig',
@@ -69,7 +68,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            "/app/staticfiles/templates",
+            (BASE_DIR / '..' / 'frontend' / 'templates').resolve(),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -85,7 +84,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'star_burger.wsgi.application'
 
-MEDIA_ROOT = os.path.join(BASE_DIR,'backend', 'media')
+MEDIA_ROOT = (BASE_DIR / 'media').resolve()
 MEDIA_URL = '/media/'
 
 DATABASES = {
@@ -128,8 +127,8 @@ INTERNAL_IPS = [
 ]
 
 STATICFILES_DIRS = [
-    os.path.join("/app/staticfiles/assets"),
-    os.path.join("/app/staticfiles/bundles"),
+    (BASE_DIR / '..' / 'frontend' / 'assets').resolve(),
+    (BASE_DIR / '..' / 'frontend' / 'bundles').resolve(),
 ]
 
 YANDEX_TOKEN = env('YANDEX_TOKEN')
