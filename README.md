@@ -156,7 +156,7 @@ Parcel будет следить за файлами в каталоге `bundle
 - `ALLOWED_HOSTS` — [см. документацию Django](https://docs.djangoproject.com/en/3.1/ref/settings/#allowed-hosts)
 - `ROLLBAR_ENVIRONMENT` - название окружения environment. По умолчанию - `production`
 
-## Фича - скрип быстрого деплоя
+Скрипт быстрого деплоя:
 
 ```sh
 #!/bin/bash
@@ -180,6 +180,122 @@ http POST https://api.rollbar.com/api/1/deploy \
   revision=$(git rev-parse HEAD)
 ```
 
+## Запуск через Docker 
+Перед запуском через докер, на сервере или локально репозиторий уже должен быть установлен. Если нет, перейдите в удобную директорию и введите команду:
+
+```shell
+git clone https://github.com/Hard-Working-Dimka/star-burger
+```
+После этого необходимо поместить файл с переменными окружения (`.end`) в папку `backend`.
+
+Репозиторий содержит две версии скрипта для запуска проекта через Docker.
+
+### Запуск через `docker-compose.yml`
+
+`docker-compose.yml` предназначен для запуска сайта на сервере. Перед его запуском необходимо установить `nginx` на сервер. Перейти в папку:
+```bash
+cd /etc/nginx/sites-enabled/
+```
+Создать файл с любым названиваем и вставить в него следующий код:
+```shell
+server {
+  listen 82.202.129.246:80;
+
+  location / {
+    include '/etc/nginx/proxy_params';
+    proxy_pass http://127.0.0.1:8081/;
+  }
+
+  location /media/ {
+    alias /var/lib/docker/volumes/star-burger_media-data/_data/;
+  }
+  location /static/{
+    alias /var/lib/docker/volumes/star-burger_frontend/_data/;
+  }
+
+  }
+```
+Во второй строке скрипта замените `82.202.129.246` на свой ip адрес сервера.
+
+Далее перейдите в папку с проектом, где находится файл `docker-compose.yml` и введите команду для запуска:
+
+```shell
+docker-compose up -d
+```
+
+### Запуск через `docker-compose-dev.yml`
+
+`docker-compose-dev.yml` предназначен для запуска локально. Основное отличие от первого скрипта - nginx запускается в контейнере. Достаточно перейти в папку с проектом и ввести команду: 
+
+```shell
+docker-compose -f docker-compose-dev.yml up -d
+```
+### Миграции  в Docker 
+
+Выполнение миграций осуществляется в отдельном контейнере. Если есть необходимость не запускать, или запустить позже, то используйте команды:
+
+Для файла `docker-compose.yml`
+* запуск без миграций
+```shell
+docker-compose -f docker-compose-dev.yml up -d frontend backend collectstatic db
+```
+* выполнение миграций отдельно
+```shell
+docker-compose -f docker-compose-dev.yml run --rm migrate
+```
+
+Для файла `docker-compose-dev.yml`
+
+* запуск без миграций
+```shell
+docker-compose -f docker-compose-dev.yml up -d frontend backend db collectstatic web
+```
+* выполнение миграций отдельно
+```shell
+docker-compose -f docker-compose-dev.yml run --rm migrate
+```
+
+### Скрипт быстрого запуска
+Используется для повторного разворачивания проекта, например, если версия на сервере репозитория устарела.  
+
+* Для `docker-compose-dev.yml`
+```bash
+#!/bin/bash
+set -Eeuo pipefail
+cd /opt/star-burger
+git pull
+docker-compose -f docker-compose-dev.yml up --build -d
+docker-compose -f docker-compose-dev.yml run --rm collectstatic
+docker-compose -f docker-compose-dev.yml run --rm migrate
+systemctl reload nginx.service
+echo "Сайт успешно обновился!"
+http POST https://api.rollbar.com/api/1/deploy \
+  X-Rollbar-Access-Token:YOUR_TOKEN \
+  accept:application/json \
+  content-type:application/json \
+  environment=production \
+  revision=$(git rev-parse HEAD)
+```
+`/opt/star-burger` заменить на директорию, в которой установлен репозиторий.
+
+* Для `docker-compose.yml`
+```bash
+#!/bin/bash
+set -Eeuo pipefail
+cd /opt/star-burger
+git pull
+docker-compose -f docker-compose.yml up -d --build
+docker-compose -f docker-compose.yml run --rm collectstatic
+docker-compose -f docker-compose.yml run --rm migrate
+echo "Сайт успешно обновился!"
+http POST https://api.rollbar.com/api/1/deploy \
+  X-Rollbar-Access-Token:YOUR_TOKEN \
+  accept:application/json \
+  content-type:application/json \
+  environment=production \
+  revision=$(git rev-parse HEAD)
+```
+`/opt/star-burger` заменить на директорию, в которой установлен репозиторий.
 ## Цель проекта
 
 Код написан в учебных целях.
